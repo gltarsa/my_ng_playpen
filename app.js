@@ -15,17 +15,24 @@ myApp.config(function($routeProvider, $locationProvider) {
       controller: 'mainController'  //using the same controller for now
     })
 
+  $routeProvider
+    .when('/second/:num', {
+      templateUrl: 'pages/second_page.html',
+      controller: 'mainController'  //using the same controller for now
+    })
+
 });
 
-myApp.controller('mainController', [ '$scope', '$filter', function($scope, $filter) {
+myApp.controller('mainController', [ '$rootScope', '$scope', '$log', '$filter', '$routeParams', function($rootScope, $scope, $log, $filter, $routeParams) {
 
-  $scope.handle = ""
+  $scope.handle = $scope.ucHandle = $scope.lcHandle = $scope.rdHandle = "";
+  $rootScope.handle_repeat = $routeParams.num || 1;
 
-  // update the lc and uc handle versions whenever handle changes.
-  $scope.$watch('handle', function(newVal, oldVal) {
-    console.log('newVal: ' + newVal);
-    $scope.lcHandle = $filter('lowercase')(newVal);
-    $scope.ucHandle = $filter('uppercase')(newVal);
-  });
-
+  $scope.updateHandleVariants = () => {
+    $scope.lcHandle = $filter('lowercase')($scope.handle).repeat($rootScope.handle_repeat)
+    $scope.ucHandle = $filter('uppercase')($scope.handle).repeat($rootScope.handle_repeat);
+    $scope.rdHandle = Array.from($scope.handle).map((c) => {
+      return (Math.floor(Math.random()*2)) ? c.toUpperCase() : c.toLowerCase();
+    }).join('').repeat($rootScope.handle_repeat);
+  };
 }]);
