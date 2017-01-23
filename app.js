@@ -23,16 +23,24 @@ myApp.config(function($routeProvider, $locationProvider) {
 
 });
 
-myApp.controller('mainController', [ '$rootScope', '$scope', '$log', '$filter', '$routeParams', function($rootScope, $scope, $log, $filter, $routeParams) {
+myApp.service('myRepeat', function() {
+  this.repeat = 1;
+});
 
+myApp.controller('mainController', ['$rootScope', '$scope', '$log', '$filter', '$routeParams', 'myRepeat', function($rootScope, $scope, $log, $filter, $routeParams, myRepeat) {
+
+  $scope.mainCallCount = $scope.mainCallCount || 0;
+  $scope.mainCallCount += 1;
   $scope.handle = $scope.ucHandle = $scope.lcHandle = $scope.rdHandle = "";
-  $rootScope.handle_repeat = $routeParams.num || 1;
+
+  myRepeat.repeat = $scope.handle_repeat = $routeParams.num || 1;
 
   $scope.updateHandleVariants = () => {
-    $scope.lcHandle = $filter('lowercase')($scope.handle).repeat($rootScope.handle_repeat)
-    $scope.ucHandle = $filter('uppercase')($scope.handle).repeat($rootScope.handle_repeat);
+    myRepeat.repeat = $scope.handle_repeat = $routeParams.num || 1;
+    $scope.lcHandle = $filter('lowercase')($scope.handle).repeat(myRepeat.repeat)
+    $scope.ucHandle = $filter('uppercase')($scope.handle).repeat(myRepeat.repeat);
     $scope.rdHandle = Array.from($scope.handle).map((c) => {
       return (Math.floor(Math.random()*2)) ? c.toUpperCase() : c.toLowerCase();
-    }).join('').repeat($rootScope.handle_repeat);
+    }).join('').repeat(myRepeat.repeat);
   };
 }]);
